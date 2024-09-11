@@ -34,7 +34,7 @@ permissions:
 jobs:
   release:
     name: Tag and Release
-    runs-on: ${{ inputs.CI-SERVER }}
+    runs-on: ${{ inputs.CI_SERVER }}
     outputs:
       release_name: ${{ steps.tag_version.outputs.new_tag }}
       tag_prefix: ${{ steps.set_prefix.outputs.prefix }}
@@ -98,7 +98,7 @@ jobs:
   
   build_and_push:
     needs: release
-    runs-on: ${{ inputs.CI-SERVER }}
+    runs-on: ${{ inputs.CI_SERVER }}
     env:
       RELEASE: ${{ needs.release.outputs.release_name }}
       PREFIX: ${{ needs.release.outputs.tag_prefix }}
