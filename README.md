@@ -12,7 +12,7 @@ on:
 
 jobs:
   cicd:
-    uses: ajmaltridz/reusable-workflows/.github/workflows/ci-cd.yaml@main
+    uses: tridz-dev/reusable-workflows/.github/workflows/ci-cd.yaml@main
     with:
       WORKFLOW_ENV: <can be development/production/offline>
       PROJECT: ${{ vars.PROJECT }} # keep it as default
