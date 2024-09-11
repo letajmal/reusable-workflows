@@ -1,0 +1,71 @@
+name: continuous delivery
+
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-inputs-and-secrets-in-a-reusable-workflow
+on:
+  workflow_call:
+    inputs:
+      WORKFLOW_ENV:
+        required: true
+        type: string
+        description: "can be production/offline/staging"
+      PROJECT:
+        required: true
+        type: string
+        description: "name of the project"
+      RUNNER:
+        required: true
+        type: string
+        description: "name of the runner"
+    secrets:
+      MARIADB_PASS:
+        required: true
+      SITE_DEFAULT_PASS:
+        required: true
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
+# only one workflow at a time in a branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false # set this to true to cancel jobs that are in progress - not required
+
+jobs:
+  deployment:
+    runs-on: ${{ inputs.RUNNER }}
+    steps:
+      -
+        name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - 
+        name: deploy
+        run: |
+          # replacing MARIADB_PASS with secret
+          sed -i "s/DB_PASSWORD/${{ secrets.MARIADB_PASS }}/g" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
+
+          # replacing SITE_DEF_PASS with secret, this password is the default password
+          # it will get replaced if you restore the backup or you can changeit manually
+          # recommended to change this later
+          sed -i "s/SITE_DEF_PASS/${{ secrets.SITE_DEFAULT_PASS }}/g" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
+
+          # Read apps.txt, replace newlines with spaces, and remove trailing space
+          APPS=$(tr '\n' ' ' < ${{ inputs.WORKFLOW_ENV }}/apps.txt | sed 's/ $//')
+          # replacing DEP_APPS with $APPS
+          sed -i "s/DEP_APPS/${APPS}/g" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
+
+          # copying files to a folder under ~ for reference
+          folder_name=$(basename "$GITHUB_WORKSPACE")
+          rm ~/$folder_name -rf | true
+          cp -r $GITHUB_WORKSPACE ~/$folder_name
+
+          # Pull the latest image
+          docker compose -f ${{ inputs.WORKFLOW_ENV }}/compose.yaml pull
+          # Stop and remove existing containers defined in docker-compose.yml
+          docker compose -f ${{ inputs.WORKFLOW_ENV }}/compose.yaml down | true
+          # Recreate and start containers
+          docker compose -f ${{ inputs.WORKFLOW_ENV }}/compose.yaml up -d
+          # Waiting for create-site to finish
+          docker compose -f ${{ inputs.WORKFLOW_ENV }}/compose.yaml logs -f create-site-${{ inputs.PROJECT }}
+          # Removing dangling(with no tags - after pull, the old image will becomes a dangling image) images
+          docker image prune -f

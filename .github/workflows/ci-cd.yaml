@@ -1,0 +1,56 @@
+name: continuous integration & continuous delivery
+
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-inputs-and-secrets-in-a-reusable-workflow
+on:
+  workflow_call:
+    inputs:
+      WORKFLOW_ENV:
+        required: true
+        type: string
+        description: "can be production/offline/staging"
+      PROJECT:
+        required: true
+        type: string
+        description: "name of the project"
+      RUNNER:
+        type: string
+        description: "name of the runner"
+      SKIP_CD:
+        type: bool
+        description: "whether to skip CD"
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      TRIDZ_USER:
+        required: true
+      TRIDZ_TOKEN:
+        required: true
+      MARIADB_PASS:
+        required: true
+      SITE_DEFAULT_PASS:
+        required: true
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yaml
+    with:
+      WORKFLOW_ENV: ${{ inputs.WORKFLOW_ENV }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      TRIDZ_USER: ${{ secrets.TRIDZ_USER }}
+      TRIDZ_TOKEN: ${{ secrets.TRIDZ_TOKEN }}
+
+  cd:
+    if: !contains( ${{ input.SKIP_CD }}, true )
+    needs: ci
+    uses: ./.github/workflows/cd.yaml
+    with:
+      WORKFLOW_ENV: ${{ inputs.WORKFLOW_ENV }}
+      PROJECT: ${{ inputs.PROJECT }}
+      RUNNER: ${{ inputs.RUNNER }} # can be changed
+    secrets:
+      MARIADB_PASS: ${{ secrets.MARIADB_PASS }}
+      SITE_DEFAULT_PASS: ${{ secrets.SITE_DEFAULT_PASS }}

@@ -1,0 +1,158 @@
+name: Release and Build
+
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-inputs-and-secrets-in-a-reusable-workflow
+on:
+  workflow_call:
+    inputs:
+      WORKFLOW_ENV:
+        required: true
+        type: string
+        description: "can be production/offline/staging"
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      TRIDZ_USER:
+        required: true
+      TRIDZ_TOKEN:
+        required: true
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
+# only one workflow at a time in a branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false # set this to true to cancel jobs that are in progress - not required
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Tag and Release
+    runs-on: ubuntu-latest
+    outputs:
+      release_name: ${{ steps.tag_version.outputs.new_tag }}
+      tag_prefix: ${{ steps.set_prefix.outputs.prefix }}
+
+    steps:
+      - 
+        name: Set prefix based on environment
+        id: set_prefix
+        run: |
+          environment="${{ inputs.WORKFLOW_ENV }}"
+          # Convert the environment value to lowercase for case-insensitive comparison
+          environment=$(echo "$environment" | tr '[:upper:]' '[:lower:]')
+          case "$environment" in
+            production)
+              prefix="v"
+              ;;
+            offline)
+              prefix="offline"
+              ;;
+            staging)
+              prefix="stg"
+              ;;
+            *)
+              echo "Unknown environment: $environment"
+              exit 1
+              ;;
+          esac
+          # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#example-defining-outputs-for-a-job
+          echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+
+      # https://github.com/actions/checkout/issues/439
+      - 
+        name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+          fetch-tags: true
+      - 
+        name: creating a changelog file
+        run: bash ./.github/scripts/changelog.sh ${{ inputs.WORKFLOW_ENV }} ${{ secrets.TRIDZ_TOKEN }}
+
+      # https://github.com/marketplace/actions/github-tag
+      - 
+        name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: ${{ steps.set_prefix.outputs.prefix }}
+          fetch_all_tags: true
+
+      # https://github.com/ncipollo/release-action
+      - 
+        name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: ${{ steps.tag_version.outputs.new_tag }}
+          bodyFile: ${{ inputs.WORKFLOW_ENV }}/COMMIT.md
+  
+  build_and_push:
+    needs: release
+    runs-on: ubuntu-latest
+    env:
+      RELEASE: ${{ needs.release.outputs.release_name }}
+      PREFIX: ${{ needs.release.outputs.tag_prefix }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - 
+        name: Preparing apps.json
+        run: |
+          # removing frappe from apps.json
+          jq '.[1:]' ${{ inputs.WORKFLOW_ENV }}/apps.json > apps.json
+          mv apps.json ${{ inputs.WORKFLOW_ENV }}/apps.json
+          # adding git token
+          sed -i "s|\${TRIDZ_USER}|${{ secrets.TRIDZ_USER }}|g" ${{ inputs.WORKFLOW_ENV }}/apps.json
+          sed -i "s|\${TRIDZ_TOKEN}|${{ secrets.TRIDZ_TOKEN }}|g" ${{ inputs.WORKFLOW_ENV }}/apps.json
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          context: .
+          file: ${{ inputs.WORKFLOW_ENV }}/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.RELEASE }},${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.PREFIX }}-latest
+          secrets: |
+            "TRIDZ_TOKEN=${{ secrets.TRIDZ_TOKEN }}"
+            "TRIDZ_USER=${{ secrets.TRIDZ_USER }}"
+
+      # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+      -
+        name: Checkout for updating the compose file
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+          path: compose-tmp
+      -
+        name: Updating compose file
+        working-directory: ./compose-tmp
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          sed -i "s|${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:[^ ]*|${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.RELEASE }}|g" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
+          git add .
+          git commit -m "New composefile for ${{ env.RELEASE }} release"
+          git push
