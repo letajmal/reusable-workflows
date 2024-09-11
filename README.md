@@ -24,6 +24,6 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }} # keep it as default
       TRIDZ_USER: ${{ secrets.TRIDZ_USER }} # keep it as default
       TRIDZ_TOKEN: ${{ secrets.TRIDZ_TOKEN }} # keep it as default
-      MARIADB_PASS: ${{ secrets.FSTG_MARIADB_PASS }} # keep it as default
-      SITE_DEFAULT_PASS: ${{ secrets.FSTG_SITE_DEFAULT_PASS }} # keep it as default
+      MARIADB_PASS: ${{ secrets.FSTG_MARIADB_PASS }} # not required
+      SITE_DEFAULT_PASS: ${{ secrets.FSTG_SITE_DEFAULT_PASS }} # not required
 ```
