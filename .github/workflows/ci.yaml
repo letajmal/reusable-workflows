@@ -74,8 +74,16 @@ jobs:
           ref: ${{ github.ref }}
           fetch-tags: true
       - 
+        name: Check out reusable-workflows repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'tridz-dev/reusable-workflows'
+          ref: 'main'
+          token: ${{ secrets.TRIDZ_TOKEN }}
+          path: 'reusable-workflows'
+      - 
         name: creating a changelog file
-        run: bash ./.github/scripts/changelog.sh ${{ inputs.WORKFLOW_ENV }} ${{ secrets.TRIDZ_TOKEN }}
+        run: bash reusable-workflows/.github/scripts/changelog.sh ${{ inputs.WORKFLOW_ENV }} ${{ secrets.TRIDZ_TOKEN }}
 
       # https://github.com/marketplace/actions/github-tag
       - 
