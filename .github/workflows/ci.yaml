@@ -8,6 +8,10 @@ on:
         required: true
         type: string
         description: "can be production/offline/development"
+      CI_SERVER:
+        required: true
+        type: string
+        description: "name of the runner which runs CI processes"
     secrets:
       DOCKERHUB_USERNAME:
         required: true

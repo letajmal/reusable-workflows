@@ -12,10 +12,10 @@ on:
         required: true
         type: string
         description: "name of the project"
-      RUNNER:
+      CD_SERVER:
         required: true
         type: string
-        description: "name of the runner"
+        description: "name of the runner - which hosts your app"
     secrets:
       MARIADB_PASS:
         required: true
