@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   deployment:
-    runs-on: ${{ inputs.RUNNER }}
+    runs-on: ${{ inputs.CD_SERVER }}
     steps:
       -
         name: Check out repository
