@@ -13,9 +13,11 @@ on:
         type: string
         description: "name of the project"
       CI_SERVER:
+        required: true
         type: string
         description: "name of the runner which runs CI processes"
       CD_SERVER:
+        required: true
         type: string
         description: "name of the runner - which hosts your app"
       SKIP_CD:
