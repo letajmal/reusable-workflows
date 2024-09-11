@@ -49,11 +49,6 @@ jobs:
           # recommended to change this later
           sed -i "s/SITE_DEF_PASS/${{ secrets.SITE_DEFAULT_PASS }}/g" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
 
-          # Read apps.txt, replace newlines with spaces, and remove trailing space
-          APPS=$(tr '\n' ' ' < ${{ inputs.WORKFLOW_ENV }}/apps.txt | sed 's/ $//')
-          # replacing DEP_APPS with $APPS
-          sed -i "s/DEP_APPS/${APPS}/g" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
-
           # copying files to a folder under ~ for reference
           folder_name=$(basename "$GITHUB_WORKSPACE")
           rm ~/$folder_name -rf | true
