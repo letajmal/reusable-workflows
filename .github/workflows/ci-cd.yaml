@@ -16,7 +16,7 @@ on:
         type: string
         description: "name of the runner"
       SKIP_CD:
-        type: bool
+        type: boolean
         description: "whether to skip CD"
     secrets:
       DOCKERHUB_USERNAME:
@@ -44,7 +44,7 @@ jobs:
       TRIDZ_TOKEN: ${{ secrets.TRIDZ_TOKEN }}
 
   cd:
-    if: !contains( ${{ input.SKIP_CD }}, true )
+    if: ${{ inputs.SKIP_CD != true }}
     needs: ci
     uses: ./.github/workflows/cd.yaml
     with:
