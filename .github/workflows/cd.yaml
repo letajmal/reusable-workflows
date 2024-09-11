@@ -18,9 +18,7 @@ on:
         description: "name of the runner - which hosts your app"
     secrets:
       MARIADB_PASS:
-        required: true
       SITE_DEFAULT_PASS:
-        required: true
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
 # only one workflow at a time in a branch

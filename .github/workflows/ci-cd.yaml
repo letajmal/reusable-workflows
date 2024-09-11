@@ -34,9 +34,7 @@ on:
       TRIDZ_TOKEN:
         required: true
       MARIADB_PASS:
-        required: true
       SITE_DEFAULT_PASS:
-        required: true
 
 jobs:
   ci:
