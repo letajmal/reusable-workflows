@@ -7,7 +7,7 @@ on:
       WORKFLOW_ENV:
         required: true
         type: string
-        description: "can be production/offline/staging"
+        description: "can be production/offline/development"
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -50,8 +50,8 @@ jobs:
             offline)
               prefix="offline"
               ;;
-            staging)
-              prefix="stg"
+            development)
+              prefix="dev"
               ;;
             *)
               echo "Unknown environment: $environment"

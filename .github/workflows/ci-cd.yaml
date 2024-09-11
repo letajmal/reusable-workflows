@@ -7,7 +7,7 @@ on:
       WORKFLOW_ENV:
         required: true
         type: string
-        description: "can be production/offline/staging"
+        description: "can be production/offline/development"
       PROJECT:
         required: true
         type: string
