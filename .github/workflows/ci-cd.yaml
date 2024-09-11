@@ -51,7 +51,7 @@ jobs:
       TRIDZ_TOKEN: ${{ secrets.TRIDZ_TOKEN }}
 
   cd:
-    if: ${{ inputs.SKIP_CD != true }}
+    if: ${{ inputs.SKIP_CD == false }}
     needs: ci
     uses: ./.github/workflows/cd.yaml
     with:
