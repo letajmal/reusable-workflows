@@ -21,6 +21,7 @@ on:
         type: string
         description: "name of the runner - which hosts your app"
       SKIP_CD:
+        required: true
         type: boolean
         description: "whether to skip CD (optional)"
     secrets:
