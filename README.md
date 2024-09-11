@@ -17,8 +17,8 @@ jobs:
       WORKFLOW_ENV: <can be development/production/offline>
       PROJECT: ${{ vars.PROJECT }} # keep it as default
       CI_SERVER: ubuntu-latest # name of the runner which runs all the CI processes
-      CD_SERVER: <> # name of the runner which hosts the app
-      SKIP_CD: false # whether you want to skip deployment or not, Optional and default is false
+      CD_SERVER: skipcdistrue # name of the runner which hosts the app, keep the default if skip cd is true
+      SKIP_CD: true # whether you want to skip deployment or not
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }} # keep it as default
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }} # keep it as default
