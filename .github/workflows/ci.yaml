@@ -168,7 +168,7 @@ jobs:
           # Read apps.txt, replace newlines with spaces, and remove trailing space
           APPS=$(tr '\n' ' ' < ${{ inputs.WORKFLOW_ENV }}/apps.txt | sed 's/ $//')
           # replacing DEP_APPS with $APPS
-          sed -i "s/install-app.*;$/${APPS}/g" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
+          sed -i "s|install-app.*;$|install-app \${APPS};|g" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
           git add .
           git commit -m "New composefile for ${{ env.RELEASE }} release"
           git push
