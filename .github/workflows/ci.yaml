@@ -164,11 +164,11 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          sed -i "0,|${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:[^ ]*|s|${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:[^ ]*|${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.RELEASE }}|" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
+          sed -i '0,|${{ secrets.DOCKERHUB_USERNAME }}\/${{ vars.DOCKERHUB_REPO }}:[^ ]*|s|${{ secrets.DOCKERHUB_USERNAME }}\/${{ vars.DOCKERHUB_REPO }}:[^ ]*|${{ secrets.DOCKERHUB_USERNAME }}\/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.RELEASE }}|' ${{ inputs.WORKFLOW_ENV }}/compose.yaml
           # Read apps.txt, replace newlines with spaces, and remove trailing space
           APPS=$(tr '\n' ' ' < ${{ inputs.WORKFLOW_ENV }}/apps.txt | sed 's/ $//')
           # replacing DEP_APPS with $APPS
-          sed -i "0,|install-app.*;$|s|install-app.*;$|install-app \${APPS};|" ${{ inputs.WORKFLOW_ENV }}/compose.yaml
+          sed -i '0,|install-app.*;$|s|install-app.*;$|install-app \${APPS};|' ${{ inputs.WORKFLOW_ENV }}/compose.yaml
           git add .
           git commit -m "New composefile for ${{ env.RELEASE }} release"
           git push
