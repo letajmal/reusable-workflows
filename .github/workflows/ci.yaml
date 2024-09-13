@@ -8,6 +8,10 @@ on:
         required: true
         type: string
         description: "can be production/offline/development"
+      PROJECT:
+        required: true
+        type: string
+        description: "name of the project"
       CI_SERVER:
         required: true
         type: string
@@ -16,6 +20,8 @@ on:
       DOCKERHUB_USERNAME:
         required: true
       DOCKERHUB_TOKEN:
+        required: true
+      DOCKERHUB_REPO:
         required: true
       USER:
         required: true
@@ -145,7 +151,7 @@ jobs:
           push: true
           context: .
           file: ${{ inputs.WORKFLOW_ENV }}/Dockerfile
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.RELEASE }},${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.PREFIX }}-latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:${{ inputs.PROJECT }}-${{ env.RELEASE }},${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:${{ inputs.PROJECT }}-${{ env.PREFIX }}-latest
           secrets: |
             "USER_TOKEN=${{ secrets.USER_TOKEN }}"
             "USER=${{ secrets.USER }}"
@@ -164,7 +170,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          sed -i '0,/${{ secrets.DOCKERHUB_USERNAME }}\/${{ vars.DOCKERHUB_REPO }}:[^ ]*/s/${{ secrets.DOCKERHUB_USERNAME }}\/${{ vars.DOCKERHUB_REPO }}:[^ ]*/${{ secrets.DOCKERHUB_USERNAME }}\/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.RELEASE }}/' ${{ inputs.WORKFLOW_ENV }}/compose.yaml
+          sed -i '0,/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:[^ ]*/s/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:[^ ]*/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:${{ inputs.PROJECT }}-${{ env.RELEASE }}/' ${{ inputs.WORKFLOW_ENV }}/compose.yaml
           # Read apps.txt, replace newlines with spaces, and remove trailing space
           APPS=$(tr '\n' ' ' < ${{ inputs.WORKFLOW_ENV }}/apps.txt | sed 's/ $//')
           # replacing DEP_APPS with $APPS

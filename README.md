@@ -24,6 +24,7 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }} # keep it as default
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }} # keep it as default
+      DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
       USER: ${{ secrets.USER }} # keep it as default
       USER_TOKEN: ${{ secrets.USER_TOKEN }} # keep it as default
       MARIADB_PASS: ${{ secrets.FSTG_MARIADB_PASS }} # not required
