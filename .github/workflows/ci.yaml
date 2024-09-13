@@ -17,9 +17,9 @@ on:
         required: true
       DOCKERHUB_TOKEN:
         required: true
-      TRIDZ_USER:
+      USER:
         required: true
-      TRIDZ_TOKEN:
+      USER_TOKEN:
         required: true
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
@@ -79,11 +79,11 @@ jobs:
         with:
           repository: 'tridz-dev/reusable-workflows'
           ref: 'main'
-          token: ${{ secrets.TRIDZ_TOKEN }}
+          token: ${{ secrets.USER_TOKEN }}
           path: 'reusable-workflows'
       - 
         name: creating a changelog file
-        run: bash reusable-workflows/.github/scripts/changelog.sh ${{ inputs.WORKFLOW_ENV }} ${{ secrets.TRIDZ_TOKEN }}
+        run: bash reusable-workflows/.github/scripts/changelog.sh ${{ inputs.WORKFLOW_ENV }} ${{ secrets.USER_TOKEN }}
 
       # https://github.com/marketplace/actions/github-tag
       - 
@@ -124,8 +124,8 @@ jobs:
           jq '.[1:]' ${{ inputs.WORKFLOW_ENV }}/apps.json > apps.json
           mv apps.json ${{ inputs.WORKFLOW_ENV }}/apps.json
           # adding git token
-          sed -i "s|\${TRIDZ_USER}|${{ secrets.TRIDZ_USER }}|g" ${{ inputs.WORKFLOW_ENV }}/apps.json
-          sed -i "s|\${TRIDZ_TOKEN}|${{ secrets.TRIDZ_TOKEN }}|g" ${{ inputs.WORKFLOW_ENV }}/apps.json
+          sed -i "s|\${USER}|${{ secrets.USER }}|g" ${{ inputs.WORKFLOW_ENV }}/apps.json
+          sed -i "s|\${USER_TOKEN}|${{ secrets.USER_TOKEN }}|g" ${{ inputs.WORKFLOW_ENV }}/apps.json
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -147,8 +147,8 @@ jobs:
           file: ${{ inputs.WORKFLOW_ENV }}/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.RELEASE }},${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_REPO }}:${{ vars.PROJECT }}-${{ env.PREFIX }}-latest
           secrets: |
-            "TRIDZ_TOKEN=${{ secrets.TRIDZ_TOKEN }}"
-            "TRIDZ_USER=${{ secrets.TRIDZ_USER }}"
+            "USER_TOKEN=${{ secrets.USER_TOKEN }}"
+            "USER=${{ secrets.USER }}"
 
       # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
       -
