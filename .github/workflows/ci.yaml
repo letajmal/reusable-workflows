@@ -77,7 +77,7 @@ jobs:
         name: Check out reusable-workflows repository
         uses: actions/checkout@v4
         with:
-          repository: 'tridz-dev/reusable-workflows'
+          repository: '${{ github.repository_owner }}/reusable-workflows'
           ref: 'main'
           token: ${{ secrets.USER_TOKEN }}
           path: 'reusable-workflows'

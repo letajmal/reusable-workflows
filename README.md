@@ -2,6 +2,8 @@
 
 ## CI-CD
 
+fork this repo for use
+
 Example
 
 ```yaml
@@ -12,7 +14,7 @@ on:
 
 jobs:
   cicd:
-    uses: letajmal/reusable-workflows/.github/workflows/ci-cd.yaml@main
+    uses: <github username>/reusable-workflows/.github/workflows/ci-cd.yaml@main
     with:
       WORKFLOW_ENV: <can be development/production/offline>
       PROJECT: ${{ vars.PROJECT }} # keep it as default
