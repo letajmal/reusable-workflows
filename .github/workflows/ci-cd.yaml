@@ -29,9 +29,9 @@ on:
         required: true
       DOCKERHUB_TOKEN:
         required: true
-      TRIDZ_USER:
+      USER:
         required: true
-      TRIDZ_TOKEN:
+      USER_TOKEN:
         required: true
       MARIADB_PASS:
       SITE_DEFAULT_PASS:
@@ -45,8 +45,8 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      TRIDZ_USER: ${{ secrets.TRIDZ_USER }}
-      TRIDZ_TOKEN: ${{ secrets.TRIDZ_TOKEN }}
+      USER: ${{ secrets.USER }}
+      USER_TOKEN: ${{ secrets.USER_TOKEN }}
 
   cd:
     if: ${{ inputs.SKIP_CD == false }}
