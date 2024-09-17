@@ -44,9 +44,11 @@ jobs:
     with:
       WORKFLOW_ENV: ${{ inputs.WORKFLOW_ENV }}
       CI_SERVER: ${{ inputs.CI_SERVER }}
+      PROJECT: ${{ inputs.PROJECT }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
       USER: ${{ secrets.USER }}
       USER_TOKEN: ${{ secrets.USER_TOKEN }}
 
