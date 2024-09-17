@@ -126,6 +126,9 @@ jobs:
       - 
         name: Preparing apps.json
         run: |
+          # extracting frappe version and repo from apps.json
+          echo "FRAPPE_BRANCH=$(jq -r '.[0].branch' ${{ inputs.WORKFLOW_ENV }}/apps.json)" >> "$GITHUB_ENV"
+          echo "FRAPPE_PATH=$(jq -r '.[0].url' ${{ inputs.WORKFLOW_ENV }}/apps.json)" >> "$GITHUB_ENV"
           # removing frappe from apps.json
           jq '.[1:]' ${{ inputs.WORKFLOW_ENV }}/apps.json > apps.json
           mv apps.json ${{ inputs.WORKFLOW_ENV }}/apps.json
@@ -155,6 +158,8 @@ jobs:
           secrets: |
             "USER_TOKEN=${{ secrets.USER_TOKEN }}"
             "USER=${{ secrets.USER }}"
+            "FRAPPE_PATH=$FRAPPE_PATH"
+            "FRAPPE_BRANCH=$FRAPPE_BRANCH"
 
       # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
       -
