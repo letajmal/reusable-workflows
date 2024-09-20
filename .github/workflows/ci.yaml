@@ -128,7 +128,7 @@ jobs:
         run: |
           # extracting frappe version from apps.json
           echo "FRAPPE_BRANCH=$(jq -r '.[0].branch' ${{ inputs.WORKFLOW_ENV }}/apps.json)" >> "$GITHUB_ENV"
-          echo $FRAPPE_BRANCH
+          echo "$FRAPPE_BRANCH"
           # removing frappe from apps.json
           jq '.[1:]' ${{ inputs.WORKFLOW_ENV }}/apps.json > apps.json
           mv apps.json ${{ inputs.WORKFLOW_ENV }}/apps.json
@@ -172,7 +172,7 @@ jobs:
         name: Updating compose file
         working-directory: ./compose-tmp
         run: |
-          echo $FRAPPE_BRANCH
+          echo "$FRAPPE_BRANCH"
       #     git config user.name "GitHub Actions"
       #     git config user.email "actions@github.com"
       #     sed -i '0,/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:[^ ]*/s/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:[^ ]*/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:${{ inputs.PROJECT }}-${{ env.RELEASE }}/' ${{ inputs.WORKFLOW_ENV }}/compose.yaml
