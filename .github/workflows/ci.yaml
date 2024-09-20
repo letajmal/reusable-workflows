@@ -155,11 +155,9 @@ jobs:
           context: .
           file: ${{ inputs.WORKFLOW_ENV }}/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:${{ inputs.PROJECT }}-${{ env.RELEASE }},${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:${{ inputs.PROJECT }}-${{ env.PREFIX }}-latest
-          secrets: |
-            "USER_TOKEN=${{ secrets.USER_TOKEN }}"
-            "USER=${{ secrets.USER }}"
-            "FRAPPE_PATH=$FRAPPE_PATH"
-            "FRAPPE_BRANCH=$FRAPPE_BRANCH"
+          build-args: |
+            "FRAPPE_PATH=${{ env.FRAPPE_PATH }}"
+            "FRAPPE_BRANCH=${{ env.FRAPPE_BRANCH }}"
 
       # https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
       -
