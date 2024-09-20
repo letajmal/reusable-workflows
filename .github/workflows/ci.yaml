@@ -127,7 +127,7 @@ jobs:
         name: Preparing apps.json
         run: |
           # extracting frappe version from apps.json
-          echo "FRAPPE_BRANCH=$(jq -r '.[0].branch' ${{ inputs.WORKFLOW_ENV }}/file.json)" >> "$GITHUB_ENV"
+          echo "FRAPPE_BRANCH=$(jq -r '.[0].branch' ${{ inputs.WORKFLOW_ENV }}/apps.json)" >> "$GITHUB_ENV"
           echo $FRAPPE_BRANCH
           # removing frappe from apps.json
           jq '.[1:]' ${{ inputs.WORKFLOW_ENV }}/apps.json > apps.json
