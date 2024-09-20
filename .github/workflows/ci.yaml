@@ -168,10 +168,11 @@ jobs:
       #     fetch-depth: 0
       #     ref: ${{ github.ref }}
       #     path: compose-tmp
-      # -
-      #   name: Updating compose file
-      #   working-directory: ./compose-tmp
-      #   run: |
+      -
+        name: Updating compose file
+        working-directory: ./compose-tmp
+        run: |
+          echo $FRAPPE_BRANCH
       #     git config user.name "GitHub Actions"
       #     git config user.email "actions@github.com"
       #     sed -i '0,/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:[^ ]*/s/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:[^ ]*/${{ secrets.DOCKERHUB_USERNAME }}\/${{ secrets.DOCKERHUB_REPO }}:${{ inputs.PROJECT }}-${{ env.RELEASE }}/' ${{ inputs.WORKFLOW_ENV }}/compose.yaml
