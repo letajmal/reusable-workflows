@@ -170,7 +170,7 @@ jobs:
       #     path: compose-tmp
       -
         name: Updating compose file
-        working-directory: ./compose-tmp
+        # working-directory: ./compose-tmp
         run: |
           echo "$FRAPPE_BRANCH"
       #     git config user.name "GitHub Actions"
